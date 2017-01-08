@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script src="clipboard.min.js"></script>
+        <style type="text/css">
+            html { box-sizing: border-box; }
+            *, *:before, *:after { box-sizing: inherit; } 
+            body { padding: 0; margin: 1em 0 0 0; }
+            .centered { margin: 0 auto; padding: 0; width: 30em; }
+            @media (max-width: 31em) { .centered { margin: 0em 0.5em; width: auto; } }
+            input, button { width: 100%; padding: 1.5em; border: 1px solid black; }
+            select { border: 1px solid black; }
+        </style>
+    </head>
+    <body>
+        <form action="javascript:void(0);" class="centered">
+            <p><textarea id="input" style="width: 100%;" rows="10"></textarea></p>
+            <p><button type="submit">Convert Google Sheets Table to HTML</button></p>
+        </form>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $('#input').focus();
+            });
+            $('form').on('submit', function () {
+                var text, doubleQuotesToken, tabToken, html;
+                text = $('#input').val();
+                doubleQuotesToken = '7e00698f93708825cee5cefd7641efad3d0887bcffb6cbe4142c5a7ff8486af2';
+                tabToken = '43334ba78dddf062148cec616fdb1892ba435aee50147647f4079f8458022091';
+                text = text
+                    .replace(/""/g, doubleQuotesToken)
+                    .split('"')
+                    .map(function (group, i) {
+                        console.log(group);
+                        if (i%2==0) return group;
+                        return group.replace(/\t/g, tabToken);
+                    }).join('');
+                html = 
+                    '<table>'
+                    + $.map(text.split('\n'), function (line, i) {
+                        return '<tr>' + $.map(line.split('\t'), function (cell, j) {
+                            return $('<div>').append($('<td>').text(cell.replace(new RegExp(tabToken,'g'),'\t').replace(new RegExp(doubleQuotesToken,'g'),'"'))).html();
+                        }).join('') + '</tr>'
+                    }).join('')
+                    + '</table>';
+                $('#input').val (html);
+                return false;
+            });
+        </script>
+    </body> 
+</html>
