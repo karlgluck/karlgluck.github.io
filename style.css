@@ -122,7 +122,7 @@ p
   padding: 2px 6px;
 }
 
-@media (min-width: 900px) 
+@media (min-width: 900px) and (hover: hover)
 {
   /* On the computer screen, don't scale too small. Apply to the top-level
      element so that the whole screen stays the same size. If you min-width
@@ -216,7 +216,7 @@ a:hover
   color: #2f3778;
 }
 
-@media (max-width: 899px) {
+@media (max-width: 899px), (hover: none) {
   .images {
     font-size: 16px; /* Reset to allow text visibility */
   }
