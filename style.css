@@ -1,0 +1,304 @@
+/* Hello! */
+
+html, body
+{
+  margin: 0;
+  padding: 0;
+  background-color: #eeeeee;
+}
+
+.hide
+{
+  display: none !important;
+}
+
+em, strong, dfn {
+  font-style: normal;
+  font-weight: bold;
+}
+
+a { text-decoration: none; }
+
+
+/* This magical combo of classes lets the top image rescale for all devices */
+.lead
+{
+  overflow: hidden;
+  text-align:center;
+}
+
+.lead-img 
+{
+  width: 105%;
+  min-width: 500px;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+/* A .block is a screen-wide section of content on this page */
+.block 
+{
+  margin: 0 auto;
+  padding: 0;
+  width: 100%;
+}
+
+/* use with .block */
+.light 
+{
+  background-color: #eeeeee;
+}
+
+/* use with .block */
+.lighter
+{
+  background-color: #fdfdfd;
+}
+
+/* Wrap content within a block to center it on the page. The width is
+   set less than the lead's min-width to give some margin on the sides.
+   The width is also based on the ideal optimal line length of 50-60
+   characters. */
+.content 
+{
+  margin: 0 auto;
+  padding: 15px 0;
+  width: 50em;
+}
+
+
+h1, h2, h3, h4, h5
+{
+  font-family: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
+  font-weight: normal;
+  color: #575757;
+}
+
+p
+{
+  color: #3c3b3b;
+  line-height: 1.5em;
+  margin-bottom: 1.5em;
+  font-family: Georgia, Times, "Times New Roman", serif;
+}
+
+.images
+{
+  font-size: 0;   /* get rid of space between images */
+}
+
+.image
+{
+  display: inline-block;
+  width: 200px;
+  height: 200px;
+  text-decoration: none;;
+}
+
+/* use two images to only display an animated thumbnail when hovered or in mobile mode */
+.image:hover .nohover {
+  display: none;
+}
+
+.onhover {
+  display: none;
+}
+
+.image:hover .onhover {
+  display: inline;
+}
+
+/* this class is applied to each of the hover labels for the lead images */
+.image-label
+{
+  display: none;
+  font-family: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
+  font-weight: normal;
+  color: #3c3b3b;
+  font-size: 16px;
+  background-color: rgba(240, 240, 255, 0.9);
+  padding: 2px 6px;
+}
+
+@media (min-width: 900px) 
+{
+  /* On the computer screen, don't scale too small. Apply to the top-level
+     element so that the whole screen stays the same size. If you min-width
+     on a smaller element, it causes width:100% attributes to be miscalculated.*/
+  body
+  {
+    min-width: 900px;
+  }
+
+  .image {
+    position: relative;
+  }
+
+  .image-label {
+    position: absolute;
+    bottom: 0%;
+    left: 0%;
+    right: 0%;
+  }
+
+  /* when an image has the mouse hovered over it, display its label and make it glow */
+  .image:hover 
+  {
+    -moz-box-shadow: 0 0 15px 5px #121c34;
+    -webkit-box-shadow: 0 0 15px 5px #121c34;
+    box-shadow: 0 0 15px 5px #121c34;
+    border: 2px solid #5985fb;
+    margin: -2px;
+    z-index: 999 !important;
+    cursor: pointer;
+  }
+  .image:hover > .image-label
+  {
+    display: inline-block;
+  }
+}
+
+.tagline
+{
+  font-family: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
+  display: block;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+@media not screen
+{
+  /* display all the image labels since the user can't hover */
+  .image-label
+  {
+    display: block;
+  }
+
+  a.image
+  {
+    margin: 0 5px 10px 5px;
+  }
+
+  .content
+  {
+    width: 420px;
+  }
+
+  .tagline
+  {
+    font-size: large;
+  }
+}
+
+@media not screen and (min-width: 630px)
+{
+  .content
+  {
+    width: 630px;
+  }
+
+  .tagline
+  {
+    font-size: x-large;
+  }
+}
+
+a, a:visited, a:active 
+{
+  color: #5985fb;
+}
+
+a:hover
+{
+  color: #2f3778;
+}
+
+@media (max-width: 899px) {
+  .images {
+    font-size: 16px; /* Reset to allow text visibility */
+  }
+
+  .image {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: auto;
+    position: static;
+    margin: 0 0 10px 0;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .image:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .image .nohover {
+  display: none;
+  }
+
+  .onhover {
+    display: inline;
+  }
+
+  .image img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border-radius: 4px;
+    margin-right: 15px;
+  }
+
+  .image-label {
+    display: block;
+    position: static;
+    background-color: transparent;
+    padding: 10px;
+    font-size: 18px;
+    color: #333333;
+    line-height: 1.4;
+    text-decoration: none;
+    flex: 1;
+  }
+
+  .image .image-label a, .image .image-label a:visited {
+    color: #333333;
+    text-decoration: none;
+  }
+
+  .image:hover .image-label {
+    color: #2f3778;
+  }
+
+  /* Disable hover effects on mobile but keep for touch if possible */
+  .image:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: none;
+    margin: 0 0 10px 0;
+    z-index: auto;
+  }
+  .image:hover > .image-label {
+    display: block; /* Already visible */
+  }
+
+  .content {
+    width: auto;
+    padding: 15px;
+  }
+
+  .lead-img {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+  }
+}
