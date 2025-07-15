@@ -84,6 +84,17 @@ p
   font-family: Georgia, Times, "Times New Roman", serif;
 }
 
+h3.role
+{
+  font-weight: bold;
+  margin: 1em 0 0;
+}
+
+p.role
+{
+  margin: 0;
+}
+
 .images
 {
   font-size: 0;   /* get rid of space between images */
