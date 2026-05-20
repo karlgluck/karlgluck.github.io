@@ -1,5 +1,394 @@
 /* Hello! */
 
+:root {
+  --font-sans: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
+  --font-serif: Georgia, Times, "Times New Roman", serif;
+  --font-mono: 'Courier New', Courier, monospace;
+}
+
+/* ==============================
+   Musings pill row
+   ============================== */
+
+.musings {
+  font-family: var(--font-sans);
+  font-size: 0.82em;
+  text-align: center;
+  color: #999;
+  margin: 0.6em 0 0;
+  letter-spacing: 0.01em;
+  line-height: 1.8;
+}
+
+/* ==============================
+   View toggle (CSS checkbox hack)
+   ============================== */
+
+.view-toggle-input {
+  display: none;
+}
+
+/* "view as list" link: only meaningful (and shown) on desktop tile mode */
+.view-as-list {
+  display: none;
+}
+
+@media (min-width: 900px) and (hover: hover) {
+  .view-as-list {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: 0.76em;
+    color: #bbb;
+    text-align: right;
+    padding: 0.5em 0 0.1em;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .view-as-list:hover { color: #5985fb; }
+
+  /* Vanish once clicked */
+  #view-toggle:checked ~ .content .view-as-list { display: none; }
+
+  /* Apply list layout */
+  #view-toggle:checked ~ .content .images { font-size: 16px; }
+
+  #view-toggle:checked ~ .content .image {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    position: static;
+    margin: 0 0 10px 0;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: none;
+  }
+
+  #view-toggle:checked ~ .content .image img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border-radius: 4px;
+    margin-right: 15px;
+  }
+
+  /* Show animated version in list mode */
+  #view-toggle:checked ~ .content .image .nohover { display: none; }
+  #view-toggle:checked ~ .content .image .onhover  { display: inline; }
+
+  #view-toggle:checked ~ .content .image .image-label {
+    display: block;
+    position: static;
+    background-color: transparent;
+    padding: 4px 10px;
+    font-size: 16px;
+    color: #333333;
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  #view-toggle:checked ~ .content .image:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: none;
+    margin: 0 0 10px 0;
+    z-index: auto;
+  }
+
+  #view-toggle:checked ~ .content .image:hover .image-label { display: block; }
+}
+
+/* ==============================
+   Writing pages
+   ============================== */
+
+.site-nav {
+  font-family: var(--font-sans);
+  font-size: 0.9em;
+  color: #aaa;
+  margin: 0 0 0.25em;
+}
+
+.article-title {
+  font-family: var(--font-sans);
+  font-weight: normal;
+  font-size: 2em;
+  color: #575757;
+  margin: 0.15em 0 0.1em;
+  text-align: center;
+}
+
+.article-meta {
+  font-family: var(--font-sans);
+  font-size: 0.82em;
+  color: #bbb;
+  text-align: center;
+  margin: 0 0 0.5em;
+  letter-spacing: 0.04em;
+}
+
+.article-back {
+  font-family: var(--font-sans);
+  font-size: 0.9em;
+  margin: 0;
+}
+
+/* Full-bleed code block: background spans viewport, code centered at natural width */
+.code-block {
+  background: #f0f0f0;
+  overflow-x: auto;
+  margin: 1.5em 0;
+  padding: 1.2em 0;
+}
+
+.code-block pre {
+  width: max-content;
+  margin: 0 auto;
+  padding: 0 2em;
+}
+
+.code-block code {
+  display: block;
+  white-space: pre;
+  font-family: var(--font-mono);
+  font-size: 0.87em;
+  line-height: 1.6;
+  color: #222;
+  tab-size: 4;
+  -moz-tab-size: 4;
+}
+
+/* Article body — figures, tables, lists, section headings */
+
+.article-body figure {
+  margin: 1.5em 0;
+  text-align: center;
+}
+
+.article-body figure img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 3px;
+}
+
+.article-body figcaption {
+  font-family: var(--font-sans);
+  font-size: 0.82em;
+  color: #999;
+  margin-top: 0.5em;
+  line-height: 1.5;
+}
+
+.article-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.9em;
+  margin: 1.5em 0;
+}
+
+.article-body table th {
+  font-weight: normal;
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #bbb;
+  border-bottom: 1px solid #ddd;
+  padding: 0.4em 1.5em 0.4em 0;
+  text-align: left;
+}
+
+.article-body table td {
+  color: #555;
+  padding: 0.55em 1.5em 0.55em 0;
+  border-bottom: 1px solid #eee;
+}
+
+.article-body ul,
+.article-body ol {
+  font-family: var(--font-serif);
+  color: #3c3b3b;
+  line-height: 1.5em;
+  padding-left: 1.5em;
+  margin: 0 0 1.5em;
+}
+
+.article-body ul li,
+.article-body ol li {
+  margin-bottom: 0.5em;
+}
+
+.article-body h2 {
+  margin-top: 2em;
+}
+
+.article-body h3 {
+  margin-top: 1.5em;
+}
+
+.article-body h4 {
+  margin-top: 1.25em;
+}
+
+/* Writing index */
+.writing-list {
+  list-style: none;
+  padding: 0;
+  margin: 1em 0;
+}
+
+.writing-list li {
+  padding: 1em 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.writing-list li:first-child { padding-top: 0; }
+.writing-list li:last-child  { border-bottom: none; }
+
+.writing-list .writing-title {
+  font-family: var(--font-sans);
+  font-size: 1.1em;
+  color: #575757;
+  display: block;
+}
+
+.writing-list .writing-title:hover { color: #2f3778; }
+
+.writing-list .writing-desc {
+  margin: 0.25em 0 0;
+  color: #777;
+  font-size: 0.92em;
+  line-height: 1.5em;
+}
+
+.writing-more {
+  font-family: var(--font-sans);
+  font-size: 0.9em;
+  margin: 0.75em 0 0;
+}
+
+/* ==============================
+   Identity intro (Layer 1)
+   ============================== */
+
+.intro {
+  font-family: var(--font-sans);
+  font-size: 0.9em;
+  color: #777;
+  text-align: center;
+  line-height: 1.75;
+  margin: 0.5em 0 0;
+}
+
+/* ==============================
+   Section headers
+   ============================== */
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.45em;
+  margin-bottom: 1.1em;
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.71em;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: #bbb;
+  margin: 0;
+}
+
+.section-header .view-as-list {
+  padding: 0;
+}
+
+/* ==============================
+   Featured cards (Layer 2)
+   ============================== */
+
+.featured-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+}
+
+.featured-card {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1.1em;
+  text-decoration: none;
+  padding: 0.9em 1em;
+  background: #fdfdfd;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+.featured-card:hover {
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+
+.featured-img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.featured-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.featured-title {
+  font-family: var(--font-sans);
+  font-weight: bold;
+  font-size: 1em;
+  color: #3c3b3b;
+  margin: 0 0 0.3em;
+}
+
+.featured-card:hover .featured-title { color: #2f3778; }
+
+.featured-desc {
+  font-family: var(--font-serif);
+  font-size: 0.87em;
+  color: #555;
+  line-height: 1.5em;
+  margin: 0 0 0.35em;
+}
+
+.featured-meta {
+  font-family: var(--font-mono);
+  font-size: 0.69em;
+  color: #aaa;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+@media (max-width: 899px), (hover: none) {
+  .featured-card {
+    flex-direction: column;
+  }
+
+  .featured-img {
+    width: 100%;
+    height: 180px;
+  }
+}
+
 html, body
 {
   margin: 0;
@@ -71,7 +460,7 @@ a { text-decoration: none; }
 
 h1, h2, h3, h4, h5
 {
-  font-family: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-weight: normal;
   color: #575757;
 }
@@ -81,7 +470,7 @@ p
   color: #3c3b3b;
   line-height: 1.5em;
   margin-bottom: 1.5em;
-  font-family: Georgia, Times, "Times New Roman", serif;
+  font-family: var(--font-serif);
 }
 
 h3.role
@@ -125,7 +514,7 @@ p.role
 .image-label
 {
   display: none;
-  font-family: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-weight: normal;
   color: #3c3b3b;
   font-size: 16px;
@@ -173,7 +562,7 @@ p.role
 
 .tagline
 {
-  font-family: Optima, Segoe, "Segoe UI", Candara, Calibri, Arial, sans-serif;
+  font-family: var(--font-sans);
   display: block;
   margin: 0;
   padding: 0;
