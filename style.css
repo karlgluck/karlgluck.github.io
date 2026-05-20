@@ -379,13 +379,17 @@
 }
 
 @media (max-width: 899px), (hover: none) {
-  .featured-card {
-    flex-direction: column;
+  .featured-img {
+    width: 96px;
+    height: 96px;
   }
 
-  .featured-img {
-    width: 100%;
-    height: 180px;
+  .featured-title {
+    font-size: 1.1em;
+  }
+
+  .featured-desc {
+    font-size: 0.95em;
   }
 }
 
