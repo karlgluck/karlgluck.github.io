@@ -6,6 +6,7 @@
     <link rel="Stylesheet" href="../style.css" />
   </head>
   <body>
+
     <div class="block lighter">
       <div class="content">
         <p class="site-nav"><a href="../index.html">Karl Gluck</a></p>
@@ -13,30 +14,150 @@
         <p class="article-meta">cryptography</p>
       </div>
     </div>
-    <div class="block light">
+
+    <div class="block light article-body">
+      <div class="content">
+
+        <h2>What&rsquo;s this all about?</h2>
+
+        <p>Digital cryptography! This is a subject I&rsquo;ve been interested in since taking a class with Prof. <a href="http://www.cs.cornell.edu/fbs/">Fred Schneider</a> back in college. Articles pop up on <a href="http://news.ycombinator.com">Hacker News</a> fairly often that pique my interest and this technique is the result of one of them.</p>
+
+        <p>Specifically, this is about <a href="http://en.wikipedia.org/wiki/Lamport_signature">Lamport signatures</a>. There are many signature algorithms (ECDSA and RSA are the most commonly used) but Lamport signatures are unique because they are formed using a hash function. Many cryptographers believe that this makes them resistant to attacks made possible by <a href="http://en.wikipedia.org/wiki/Shor%27s_algorithm">quantum computers</a>.</p>
+
+        <h2>How Does a Lamport Signature Work?</h2>
+
+        <p><a href="http://en.wikipedia.org/wiki/Lamport_signature#Mathematical_description">Here&rsquo;s the long version</a>. This is the short copy without all the parameterization:</p>
+
+        <ol>
+          <li>Come up with 2 sets (set A and set B) each containing 256 random 256-bit numbers. Keep these secret! They&rsquo;re your private key.</li>
+          <li>Take the SHA-256 hash of each of your secret numbers. These 512 hashes are your public key.</li>
+          <li>Get the SHA-256 hash of whatever document you want to sign.</li>
+          <li>For each bit <code>i</code> of the hash from <code>0..256</code>: if the bit is a <code>0</code>, publish the <code>i</code>th number from secret set A; if it is a <code>1</code>, publish the <code>i</code>th number from secret set B. Destroy all unused numbers.</li>
+          <li>You now have a signature (the 256 random numbers from step 4 corresponding to the bits of the hash from step 3) and a public key (the 512 hashes from step 2 that define whether the value of each bit is 0 or 1).</li>
+        </ol>
+
+        <p>Because hashes are one-way functions, it is <a href="http://en.wikipedia.org/wiki/Computational_hardness_assumption">computationally hard</a> to forge the secret random numbers you created in step 1 that would allow an attacker to change your signature. In other words, it takes an impractically huge amount of processing power for an adversary to produce verifiable proof that you signed something other than what you actually signed.</p>
+
+        <p>There are two snags with using Lamport signatures in practice:</p>
+
+        <ol>
+          <li>This is a one-time signature. You can&rsquo;t sign anything else with the same public key. Doing so reveals more of your secret numbers and would allow an attacker to forge your signature for other documents. Fortunately, this is easily solved with a hash tree that merges many public keys down to a single &ldquo;root&rdquo;&mdash;this is called the <a href="http://en.wikipedia.org/wiki/Merkle_signature_scheme">Merkle signature scheme</a>.</li>
+          <li>The signatures are enormous compared to ECDSA or RSA. Signing an <code>N</code>-bit hash requires <code>N</code> hashes of <code>N</code> bits each. That&rsquo;s 8 KiB for signing a 256-bit hash or 32 KiB for a 512-bit hash&mdash;around 1000&times; the size of a comparable ECDSA signature.</li>
+        </ol>
+
+        <h2>How to Shorten Lamport Signatures</h2>
+
+        <p>The Wikipedia article outlines ways to shorten the private key using a <a href="http://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator">cryptographically secure pseudorandom number generator</a> and compress the public key with a <a href="http://en.wikipedia.org/wiki/Hash_list">hash list</a>. No solution for shortening the public signature itself is published. That&rsquo;s what I hope to contribute with this article!</p>
+
+        <h3>The Other End of the Spectrum: A Hash Ladder</h3>
+
+        <p>First, I present a toy demonstration of the algorithm. It is impractical to implement for a number of reasons, but it shows the functionality. After we go through this, I&rsquo;ll modify it to make it usable in practice.</p>
+
+        <p>Assume you have a 3-bit signature of a document, <code>H_3bit(document) = 6</code>. Pick two random 5-bit values, <code>12</code> and <code>29</code>, as your private key. Hash each value <code>2^signed_hash_bits + 2 = 2^3 + 2 = 10</code> times with a perfect random 5-bit oracle called <code>H_5bit</code>. Each possible value of your 3-bit hash has a corresponding index in these chains of 5-bit hashes:</p>
+
+      </div>
+
+      <div class="code-block">
+<pre><code>hash ix:  [0]    [1]    [2]    [3]    [4]    [5]    [6]    [7]
+A: 12 -->  5 --> 24 -->  9 -->  1 --> 15 --> 10 -->  8 --> 11 --> 27
+B: 23 &lt;-- 19 &lt;-- 20 &lt;--  4 &lt;-- 13 &lt;-- 17 &lt;--  3 &lt;-- 14 &lt;-- 28 &lt;-- 29
+                                                     ^</code></pre>
+      </div>
 
       <div class="content">
-        <p>Post content goes here. Paste in your draft and I'll clean it up.</p>
-        <p>Prose sections live inside <code>.content</code> divs like this one.</p>
+
+        <p><code>A</code> starts on the left and repeated hashes are listed to the right. <code>B</code> starts on the right and repeated hashes are listed to the left. This forms the &ldquo;ladder&rdquo; metaphor, with pairs of hashes making the &ldquo;rungs&rdquo;. The hash is 5 bits to accommodate at least 20 unique non-colliding hashes. In this example, I made up a perfect random oracle hash function with no collisions. In practice, the hash values are incredibly unlikely to collide because their range is 256+ bits rather than 5.</p>
+
+        <p>The values at the end of each chain&mdash;<code>(A=27, B=23)</code>&mdash;are your public key.</p>
+
+        <p>To sign your document with hash <code>6</code>, find the pair of values at that index: <code>[6] = (A=8, B=14)</code>. By publishing these values, anyone with the public key <code>(A=27, B=23)</code> can verify that the pair <code>(A=8, B=14)</code> corresponds to the value <code>6</code>:</p>
+
+        <ul>
+          <li>Take the A part of the signature pair, <code>8</code>. Hash it until it equals <code>27</code>, the A part of the public key. This takes <code>2</code> hashes.</li>
+          <li>Take the B part of the signature pair, <code>14</code>. Hash it until it equals <code>23</code>, the B part of the public key. This takes <code>7</code> hashes.</li>
+          <li>The length of each hash chain when producing the public key is <code>8</code>. This is public knowledge as an algorithmic constant.</li>
+          <li><code>8&minus;2 = 6</code>, which is the claimed hash value. <code>7&minus;1 = 6</code>, which is also the claimed hash value. These values equal each other, confirming the value that was signed by the owner of public key <code>(A=27, B=23)</code>.</li>
+        </ul>
+
+        <p>An adversary cannot create a valid signature for another value without inverting one of the hashes. For example, to change the pair to sign the value <code>7</code>, the adversary must be able to solve <code>H_5bit(x) = 14</code> for <code>x</code> in order to produce the pair <code>(11, 28)</code>. Similarly, to sign the value <code>5</code>, the adversary must invert <code>H_5bit(x) = 8</code> and produce the pair <code>(10, 3)</code>. I call this construct a <strong>hash ladder</strong> because every pair of hash values in the two rows locks each other in place and defines a distinct location on the number line.</p>
+
+        <p>We can&rsquo;t actually use this in practice without some modification. Real hashes are at least 256 bits. Creating a signature in this way for a 256-bit value would require a 257-bit hash function to be executed <code>2&times;2<sup>256</sup>+2</code> times just to make the public key. Not only would one signature take longer to compute than the age of the universe, it isn&rsquo;t secure without a hash function that is a perfect random oracle&mdash;and any machine that could actually compute this would be able to invert hashes by brute force anyway.</p>
+
+        <p>To shorten Lamport signatures with a <strong>hash ladder</strong> in practice, we need to chop up the hash to be signed into chunks with not very many bits (8&ndash;16) and create a ladder for each. With between <code>2<sup>8</sup></code> and <code>2<sup>16</sup></code> positions on the ladder, each ladder is short enough to be both computable and to have a very low probability of hash collisions within it.</p>
+
+        <h3>The Implementable Algorithm</h3>
+
+        <p>While this can be parameterized to use different chunk sizes and hash sizes, I present the algorithm here using 8-bit chunks and 256-bit hashes.</p>
+
+        <h4>Signing</h4>
+
+        <ol>
+          <li>Take the SHA-256 hash of the document you want to sign.</li>
+          <li>Split the 256-bit hash of your document into 32 8-bit chunks.</li>
+          <li>For each chunk, generate a pair of secret random 256-bit numbers. These 64 numbers are your private key.</li>
+          <li>Hash each of these numbers 258 times. This final set of 32 pairs of hashes is your public key. (Note: use a hash chain and this public key compresses to just 256 bits.)</li>
+          <li>To create your signature, examine each chunk again. Let the value of the chunk be <code>n</code> in the range <code>[0, 255]</code>. For the pair of private key numbers associated with that chunk: let <code>a</code> equal the first number hashed <code>n+1</code> times, and let <code>b</code> equal the second number hashed <code>256&minus;n</code> times. Publish the result <code>(a, b)</code>. This is your signature for this 8-bit chunk.</li>
+          <li>Collect the 32 chunk signatures. You now have a <code>32&times;2&times;(256/8) = 2 KiB</code> signature&mdash;4&times; smaller than the standard Lamport signature.</li>
+        </ol>
+
+        <h4>Verifying</h4>
+
+        <ol>
+          <li>Take the SHA-256 hash of the document you want to verify.</li>
+          <li>Split the 256-bit hash of the document into 32 8-bit chunks.</li>
+          <li>For each chunk, let <code>V</code> be the chunk&rsquo;s value from the hash, <code>(a, b)</code> be the signature pair, and <code>(Pa, Pb)</code> be the corresponding public key pair.</li>
+          <li>Hash <code>a</code> and count iterations until it equals <code>Pa</code>, or until it has been hashed 256 times. If 256 iterations pass without reaching <code>Pa</code>, the signature is invalid. Save the iteration count as <code>i_a</code>.</li>
+          <li>Repeat step&nbsp;4 for <code>b</code>, saving the iteration count as <code>i_b</code>.</li>
+          <li>If <code>256&minus;i_a &ne; i_b&minus;1</code> or <code>256&minus;i_a &ne; V</code>, the signature is invalid.</li>
+          <li>If there are more chunks, continue from step&nbsp;3.</li>
+          <li>The signature is valid if all chunks pass.</li>
+        </ol>
+
+        <h2>Details</h2>
+
+        <p>We trade storage size for computation. Rather than computing 256 hashes to verify a 256-bit signature, we now compute at least <code>256/8 &times; 256 = 8,192</code> hashes. Given that hash functions are intended to be fast, this is likely a good tradeoff for cacheable chunk sizes.</p>
+
+        <p>If <code>n</code> is the number of bits in the hash function and <code>k</code> is the chunk size in bits:</p>
+
+        <ul>
+          <li><code>(n/8) &times; 2 &times; (n/k)</code> bytes is the size of the public key</li>
+          <li><code>(n/k) &times; 2<sup>k</sup></code> is the number of hashes required to verify</li>
+        </ul>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Hash bits</th>
+              <th>Chunk bits</th>
+              <th>Public key size</th>
+              <th>Relative size</th>
+              <th>Hashes to verify</th>
+              <th>Time @ 100 kHps</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>256</td><td>Lamport</td><td>4096 bytes</td><td>100%</td><td>256</td><td>2 ms</td></tr>
+            <tr><td>256</td><td>8</td><td>2048 bytes</td><td>50%</td><td>8,192</td><td>8 ms</td></tr>
+            <tr><td>256</td><td>12</td><td>~1400 bytes</td><td>~30%</td><td>~90,000</td><td>~1 s</td></tr>
+            <tr><td>256</td><td>16</td><td>2048 bytes</td><td>25%</td><td>1,048,576</td><td>~10 s</td></tr>
+            <tr><td>512</td><td>Lamport</td><td>32768 bytes</td><td>100%</td><td>512</td><td>4 ms</td></tr>
+            <tr><td>512</td><td>8</td><td>8192 bytes</td><td>25%</td><td>16,348</td><td>160 ms</td></tr>
+            <tr><td>512</td><td>12</td><td>~5500 bytes</td><td>~17%</td><td>~176,128</td><td>~1.8 s</td></tr>
+            <tr><td>512</td><td>16</td><td>4096 bytes</td><td>13%</td><td>1,048,576</td><td>~21 s</td></tr>
+          </tbody>
+        </table>
+
+        <p>100 kHps (100,000 hashes per second) was chosen from <a href="https://en.bitcoin.it/wiki/Mining_hardware_comparison">this hardware comparison</a> as a conservative baseline; most CPUs can do SHA-256 at at least the megahash-per-second level.</p>
+
       </div>
-
-      <!--
-        Code blocks go OUTSIDE .content divs — that's what makes the background
-        bleed to the screen edges while keeping the code centered:
-
-      -->
-      <div class="code-block">
-<pre><code>your code here
-  indented as needed
-no leading whitespace before the opening tag</code></pre>
-      </div>
-
     </div>
+
     <div class="block lighter">
       <div class="content">
         <p class="article-back"><a href="index.html">&larr; all writing</a></p>
       </div>
       <div class="content"><br /></div>
     </div>
+
   </body>
 </html>
