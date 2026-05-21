@@ -320,31 +320,36 @@
 .featured-list {
   display: flex;
   flex-direction: column;
-  gap: 0.8em;
+  gap: 10px;
 }
 
 .featured-card {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  gap: 1.1em;
+  align-items: center;
   text-decoration: none;
-  padding: 0.9em 1em;
-  background: #fdfdfd;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s ease;
 }
 
 .featured-card:hover {
-  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .featured-img {
-  width: 96px;
-  height: 96px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
-  border-radius: 3px;
   flex-shrink: 0;
+  border-radius: 4px;
+  margin-right: 15px;
 }
 
 .featured-body {
@@ -355,42 +360,23 @@
 .featured-title {
   font-family: var(--font-sans);
   font-weight: bold;
-  font-size: 1em;
-  color: #3c3b3b;
-  margin: 0 0 0.3em;
+  font-size: 16px;
+  color: #333333;
+  margin: 0 0 0.25em;
 }
 
 .featured-card:hover .featured-title { color: #2f3778; }
 
 .featured-desc {
-  font-family: var(--font-serif);
-  font-size: 0.87em;
-  color: #555;
-  line-height: 1.5em;
-  margin: 0 0 0.35em;
-}
-
-.featured-meta {
-  font-family: var(--font-mono);
-  font-size: 0.69em;
-  color: #aaa;
-  letter-spacing: 0.04em;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: #333333;
+  line-height: 1.4;
   margin: 0;
 }
 
-@media (max-width: 899px), (hover: none) {
-  .featured-img {
-    width: 96px;
-    height: 96px;
-  }
-
-  .featured-title {
-    font-size: 1.1em;
-  }
-
-  .featured-desc {
-    font-size: 0.95em;
-  }
+.featured-meta {
+  display: none;
 }
 
 html, body
